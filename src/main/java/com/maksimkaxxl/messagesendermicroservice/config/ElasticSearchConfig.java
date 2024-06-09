@@ -6,15 +6,15 @@ import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchConfiguration;
 
 @Configuration
-public class ElasticSearchConfig extends ElasticsearchConfiguration {
+public class ElasticSearchConfig /*extends ElasticsearchConfiguration*/ {
 
-    @Value("${elasticsearch.address}")
-    private String esAddress;
-
-    @Override
-    public ClientConfiguration clientConfiguration() {
-        return ClientConfiguration.builder()
-                .connectedTo(esAddress)
-                .build();
-    }
+//    @Value("${elasticsearch.address}")
+//    private String esAddress;
+//
+//    @Override
+//    public ClientConfiguration clientConfiguration() {
+//        return ClientConfiguration.builder()
+//                .connectedTo(esAddress)
+//                .build();
+//    }
 }
