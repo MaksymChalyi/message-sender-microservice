@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class MessageSenderMicroserviceApplication {
 
     public static void main(String[] args) {
-//        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
         SpringApplication.run(MessageSenderMicroserviceApplication.class, args);
     }
 

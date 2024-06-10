@@ -2,6 +2,7 @@ package com.maksimkaxxl.messagesendermicroservice.services.email.impl;
 
 import com.maksimkaxxl.messagesendermicroservice.models.EmailMessage;
 import com.maksimkaxxl.messagesendermicroservice.models.enums.EmailStatus;
+import com.maksimkaxxl.messagesendermicroservice.repositories.EmailMessageRepository;
 import com.maksimkaxxl.messagesendermicroservice.services.email.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -17,7 +18,7 @@ import java.time.Instant;
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
-//    private final EmailMessageRepository emailMessageRepository;
+    private final EmailMessageRepository emailMessageRepository;
 
     @Override
     public void sendEmailMessage(EmailMessage emailMessage) {

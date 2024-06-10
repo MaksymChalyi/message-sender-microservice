@@ -21,9 +21,9 @@ public class EmailSenderListener {
 //        emailService.sendEmailMessage(jsonMessage);
         try {
             EmailMessage emailMessage = objectMapper.readValue(jsonMessage, EmailMessage.class);
+//            System.out.println("EmailMessage=" + emailMessage);
             emailService.sendEmailMessage(emailMessage);
         } catch (Exception e) {
-            // Обробляємо помилку десеріалізації або відправки електронного листа
             e.printStackTrace();
         }
     }
