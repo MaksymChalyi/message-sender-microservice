@@ -4,17 +4,21 @@ import com.maksimkaxxl.messagesendermicroservice.models.EmailMessage;
 import com.maksimkaxxl.messagesendermicroservice.models.enums.EmailStatus;
 import com.maksimkaxxl.messagesendermicroservice.repositories.EmailMessageRepository;
 import com.maksimkaxxl.messagesendermicroservice.services.email.EmailService;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
@@ -29,13 +33,27 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject(emailMessage.getSubject());
             helper.setText(emailMessage.getContent(), true);
             mailSender.send(mimeMessage);
+            emailMessage.setErrorMessage(null);
             emailMessage.setEmailStatus(EmailStatus.SENT);
-        } catch (MessagingException e) {
+
+        } catch (Exception e) {
             emailMessage.setEmailStatus(EmailStatus.FAILED);
             emailMessage.setErrorMessage(e.getClass().getSimpleName() + ": " + e.getMessage());
         }
-        emailMessage.setLastAttemptTime(Instant.now().toEpochMilli());
-        emailMessage.setRetryCount(emailMessage.getRetryCount() + 1);
-//        emailMessageRepository.save(emailMessage);
+
+        emailMessage.setLastAttemptTime(Instant.now());
+        emailMessage.setRetryCount(Optional.of(emailMessage.getRetryCount()).orElse(0) + 1);
+        emailMessageRepository.save(emailMessage);
     }
+
+
+    @Scheduled(fixedRate = 300_000)
+    public void retryFailedEmails() {
+        List<EmailMessage> failedMessages = emailMessageRepository.findByEmailStatus(String.valueOf(EmailStatus.FAILED));
+        for (var emailMessage : failedMessages) {
+            sendEmailMessage(emailMessage);
+        }
+
+    }
+
 }
