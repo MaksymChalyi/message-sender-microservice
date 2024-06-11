@@ -6,7 +6,6 @@ import com.maksimkaxxl.messagesendermicroservice.repositories.EmailMessageReposi
 import com.maksimkaxxl.messagesendermicroservice.services.email.EmailService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,7 +17,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
@@ -49,11 +47,10 @@ public class EmailServiceImpl implements EmailService {
 
     @Scheduled(fixedRate = 300_000)
     public void retryFailedEmails() {
-        List<EmailMessage> failedMessages = emailMessageRepository.findByEmailStatus(String.valueOf(EmailStatus.FAILED));
+        List<EmailMessage> failedMessages = emailMessageRepository.findByEmailStatus(EmailStatus.FAILED);
         for (var emailMessage : failedMessages) {
             sendEmailMessage(emailMessage);
         }
-
     }
 
 }

@@ -14,13 +14,11 @@ public class EmailSenderListener {
 
     private final EmailService emailService;
     private final ObjectMapper objectMapper;
-//    private final EmailService emailService;
 
     @KafkaListener(topics = "${kafka.topic.mailSender}")
     public void employeeAdded(String jsonMessage) {
         try {
             EmailMessage emailMessage = objectMapper.readValue(jsonMessage, EmailMessage.class);
-            System.out.println("EmailMessage=" + emailMessage);
             emailService.sendEmailMessage(emailMessage);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
