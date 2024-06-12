@@ -45,13 +45,14 @@ services:
     container_name: kafka
     ports:
       - '9092:9092'
+      - '29092:29092'
     environment:
       - KAFKA_BROKER_ID=1
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,EXTERNAL://:29092  # Оновлення рядка для прослуховування нового порту
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:29092  # Оновлення рядка з рекламною адресою для нового порту
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT  # Оновлення рядка для прослуховування нового порту
     depends_on:
       - zookeeper
     healthcheck:
@@ -66,15 +67,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: on-failure
     container_name: 'java-mail-sender-app'
     ports:
       - '8081:8081'
     env_file: ./.env
     depends_on:
-      elasticsearch:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
+      - elasticsearch
+      - kafka
     environment:
       - ELASTICSEARCH_ADDRESS=elasticsearch:9200
       - KAFKA_ADDRESS=kafka:9092
