@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maksimkaxxl.messagesendermicroservice.models.EmailMessage;
 import com.maksimkaxxl.messagesendermicroservice.services.email.EmailService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class EmailSenderListener {
 
     private final EmailService emailService;
@@ -17,11 +19,14 @@ public class EmailSenderListener {
 
     @KafkaListener(topics = "${kafka.topic.mailSender}")
     public void employeeAdded(String jsonMessage) {
+        log.info("Received message: {}", jsonMessage);
         try {
             EmailMessage emailMessage = objectMapper.readValue(jsonMessage, EmailMessage.class);
+            log.info("Parsed EmailMessage: {}", emailMessage);
             emailService.sendEmailMessage(emailMessage);
+            log.info("EmailMessage processed successfully");
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Failed to parse JSON message: {}", jsonMessage, e);
         }
     }
 
