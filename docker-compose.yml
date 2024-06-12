@@ -13,10 +13,10 @@ services:
     ports:
       - "9200:9200"
     healthcheck:
-      test: curl -u elastic:elastic -s -f elasticsearch:9200/_cat/health >/dev/null || exit 1
+      test: curl -s http://elasticsearch:9200 >/dev/null || exit 1
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 50
     networks:
       - my-network
 
@@ -48,11 +48,17 @@ services:
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
     depends_on:
       - zookeeper
+    healthcheck:
+      test: curl -s http://kafka:9092 >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
     networks:
       - my-network
 
@@ -63,12 +69,15 @@ services:
     container_name: 'java-mail-sender-app'
     ports:
       - '8081:8081'
-    env_file: .env
+    env_file: ./.env
     depends_on:
-      - elasticsearch
-      - kafka
+      elasticsearch:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
       - ELASTICSEARCH_ADDRESS=elasticsearch:9200
+      - KAFKA_ADDRESS=kafka:9092
     networks:
       - my-network
 
