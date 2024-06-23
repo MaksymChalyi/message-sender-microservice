@@ -15,12 +15,6 @@ The Message Sender Microservice has the following dependencies:
 
 These dependencies are managed and configured within the project's `pom.xml` file and Docker Compose configuration.
 
-Got it, here's a simplified version:
-
----
-
-# Message Sender Microservice
-
 ## How to Run
 
 1. Clone this repository and open in IDEA;
